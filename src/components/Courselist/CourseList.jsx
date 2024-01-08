@@ -1,5 +1,6 @@
 // ** MUI Imports
 "use client"
+import React, { useState } from 'react';
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Chip from '@mui/material/Chip'
@@ -11,6 +12,7 @@ import TableCell from '@mui/material/TableCell'
 import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 import { Button } from '@mui/material'
+import Link from 'next/link'
 
 const rows = [
   {
@@ -89,11 +91,25 @@ const statusObj = {
 }
 
 const CourseList = () => {
+  const [courseData, setCourseData] = useState(rows);
+
+  const handleEdit = (index) => {
+    const updatedData = [...courseData];
+    updatedData[index].title = 'Updated Course Title';
+    setCourseData(updatedData);
+  };
+
+  const handleDelete = (index) => {
+    const updatedData = courseData.filter((_, i) => i !== index);
+    setCourseData(updatedData);
+  };
+
+
   return (
     <Card sx={{margin:'1rem'}}>
         <Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem'}}>
         <Typography padding='1rem' fontFamily='Rubik' fontSize='25px'>Course List</Typography>
-        <Button  variant='outlined' sx={{ width:'200px',height:'40px', border:'2px solid #f3f3f3',background:'#f9d423',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#f9d423'}}}>  Add Course</Button>
+       <Link href='./addcourse'><Button  variant='outlined' sx={{ width:'200px',height:'40px', border:'2px solid #f3f3f3',background:'#f9d423',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#f9d423'}}}>  Add Course</Button></Link> 
         </Box>
       <TableContainer>
         <Table sx={{ minWidth: 800 }} aria-label='table in dashboard'>
@@ -110,9 +126,9 @@ const CourseList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row,index) => (
-              <TableRow hover key={index} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
-                <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
+        {courseData.map((row, index) => (
+          <TableRow hover key={index} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
+         <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{row.title}</Typography>
                     {/* <Typography variant='caption'>{row.booking}</Typography> */}
@@ -135,8 +151,36 @@ const CourseList = () => {
                     }}
                   /> */}
                   
-                  <Button  variant='outlined' sx={{ width:'100px', border:'2px solid #f3f3f3',background:'#11ffbd',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#11ffbd'}}}>  Edit</Button>
-                  <Button variant='outlined' sx={{ width:'100px',border:'2px solid #f3f3f3',background:'#ff4e50',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#ff4e50'}}}>            Delete</Button>
+                  <Button
+                variant='outlined'
+                onClick={() => handleEdit(index)}
+                sx={{
+                  width: '100px',
+                  border: '2px solid #f3f3f3',
+                  background: '#11ffbd',
+                  textTransform: 'none',
+                  color: '#fff',
+                  borderRadius: '17px',
+                  '&:hover': { border: '2px solid #f3f3f3', background: '#11ffbd' },
+                }}
+              >
+                Edit
+              </Button>
+              <Button
+                variant='outlined'
+                onClick={() => handleDelete(index)}
+                sx={{
+                  width: '100px',
+                  border: '2px solid #f3f3f3',
+                  background: '#ff4e50',
+                  textTransform: 'none',
+                  color: '#fff',
+                  borderRadius: '17px',
+                  '&:hover': { border: '2px solid #f3f3f3', background: '#ff4e50' },
+                }}
+              >
+                Delete
+              </Button>
 
                 </TableCell>
                

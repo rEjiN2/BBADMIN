@@ -11,6 +11,7 @@ import TableCell from '@mui/material/TableCell'
 import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 import { Button } from '@mui/material'
+import Link from 'next/link'
 
 const rows = [
   {
@@ -78,7 +79,7 @@ const ClientList = () => {
     <Card sx={{margin:'1rem'}}>
         <Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem'}}>
         <Typography padding='1rem' fontFamily='Rubik' fontSize='25px'>Client List</Typography>
-        <Button  variant='outlined' sx={{ width:'200px',height:'40px', border:'2px solid #f3f3f3',background:'#f9d423',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#f9d423'}}}>  Add Client</Button>
+        <Link href='./addclients'><Button  variant='outlined' sx={{ width:'200px',height:'40px', border:'2px solid #f3f3f3',background:'#f9d423',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#f9d423'}}}>  Add Client</Button></Link>
         </Box>
       <TableContainer>
         <Table sx={{ minWidth: 800 }} aria-label='table in dashboard'>

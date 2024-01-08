@@ -164,7 +164,7 @@ const BasicLayout = ({ children }) => {
               />
             </ListItemButton>
             </Link>
-            <Link href='/accountsettings'>
+            <Link href='/settings'>
             <ListItemButton
               selected={selectedIndex === 4}
               onClick={(event) => handleListItemClick(event, 4)}
