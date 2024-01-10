@@ -26,6 +26,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import UserPic from '../../../public/user.jpeg'
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import LoginIcon from '@mui/icons-material/Login';
+import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -164,10 +165,31 @@ const BasicLayout = ({ children }) => {
               />
             </ListItemButton>
             </Link>
-            <Link href='/settings'>
+           
+            <Link href='/addsubscription'>
             <ListItemButton
               selected={selectedIndex === 4}
               onClick={(event) => handleListItemClick(event, 4)}
+            >
+              <ListItemIcon style={{ minWidth: "35px" }}>
+                <SubscriptionsIcon sx={{color:'#F3904F'}}/>
+              </ListItemIcon>
+              <ListItemText
+                primary="Add Susbcription"
+                sx={{
+                  fontFamily: "CircularStdBold",
+                  color: "#237A57",
+                  fontSize: "16px",
+                  paddingTop: "0.1rem",
+                }}
+              />
+            </ListItemButton>
+            </Link>
+
+            <Link href='/settings'>
+            <ListItemButton
+              selected={selectedIndex === 4}
+              onClick={(event) => handleListItemClick(event, 5)}
             >
               <ListItemIcon style={{ minWidth: "35px" }}>
                 <SupportAgentIcon sx={{color:'#F3904F'}}/>
@@ -183,6 +205,7 @@ const BasicLayout = ({ children }) => {
               />
             </ListItemButton>
             </Link>
+
             <Box sx={{height:'1px',background:'#f3f3f9',width:'100%',marginBottom:'1rem '}}></Box>
 
 
@@ -190,7 +213,7 @@ const BasicLayout = ({ children }) => {
 
             <ListItemButton
               selected={selectedIndex === 4}
-              onClick={(event) => handleListItemClick(event, 4)}
+              onClick={(event) => handleListItemClick(event, 6)}
             >
              
               <ListItemIcon style={{ minWidth: "35px" }}>
@@ -280,12 +303,12 @@ const BasicLayout = ({ children }) => {
           sx={{
             height: "92dvh",
             overflow: "auto",
-            scrollbarWidth: "none", // Hide the scrollbar for firefox
+            scrollbarWidth: "none",
             "&::-webkit-scrollbar": {
-              display: "none", // Hide the scrollbar for WebKit browsers (Chrome, Safari, Edge, etc.)
+              display: "none", 
             },
             "&-ms-overflow-style:": {
-              display: "none", // Hide the scrollbar for IE
+              display: "none", 
             },
             
           }}
