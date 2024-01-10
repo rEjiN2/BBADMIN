@@ -1,76 +1,93 @@
 "use client";
 import React, { useState } from 'react';
-import {
-  Typography,
-  Paper,
-  TextField,
-  Button,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextareaAutosize,
-  InputAdornment,
-  Chip,
-} from '@mui/material';
+import { Typography, Paper, TextField,  Button,  Grid,  FormControl,  InputLabel,  Select,  MenuItem, TextareaAutosize, InputAdornment, Chip,  Box,} from '@mui/material';
 import Image from 'next/image';
+import { Add } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
 
 const AddCourse = () => {
-  const [courseDetails, setCourseDetails] = useState({
-    title: '',
-    description: '',
-    image: '',
-    price: '',
-    selectedDateTimes: [],
-  });
-
-
-  
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    setCourseDetails({ ...courseDetails, image: file, previewImage: URL.createObjectURL(file) });
-  };
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setCourseDetails({ ...courseDetails, [name]: value });
-  };
-
-  const handleTimeChange = (dateIndex, time) => {
-    const updatedDateTimes = [...courseDetails.selectedDateTimes];
-    updatedDateTimes[dateIndex].times.push(time);
-    setCourseDetails({ ...courseDetails, selectedDateTimes: updatedDateTimes });
-  };
-
+  const [title,setTitle] = useState('')
+  const [description,setDescriptiom] = useState('')
+  const [image,setImage] = useState(null);
+  const [price,setPrice]= useState(80)
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [dateTimeChips, setDateTimeChips] = useState([]);
+  const [maxUsers,setMaxUser] = useState(50)
   const handleDateChange = (event) => {
-    const { value } = event.target;
-    setCourseDetails({
-      ...courseDetails,
-      selectedDateTimes: [...courseDetails.selectedDateTimes, { date: value, times: [] }],
+    setSelectedDate(event.target.value);
+};
+const handleTimeChange = (event) => {
+    setSelectedTime(event.target.value);
+};
+
+const addDateTime = () => {
+    if (selectedDate && selectedTime) {
+        const existingDate = dateTimeChips.find(entry => entry.date === selectedDate);
+        if (existingDate) {        
+            if (!existingDate.time.includes(selectedTime)) {
+                existingDate.time.push(selectedTime);
+                setDateTimeChips([...dateTimeChips]);
+            } else {             
+                alert("This time is already selected for the chosen date.");
+            }
+        } else {
+            setDateTimeChips([...dateTimeChips, { date: selectedDate, time: [selectedTime] }]);
+        }
+        setSelectedTime('');
+    }
+};
+
+const deleteChip = (date, timeToDelete) => {
+  setDateTimeChips(dateTimeChips => {
+  
+    const updatedChips = dateTimeChips.map(entry => {
+      if (entry.date === date) {
+        return { ...entry, time: entry.time.filter(time => time !== timeToDelete) };
+      }
+      return entry;
     });
-  };
 
-  const handleChipDelete = (dateIndex, timeIndex) => {
-    const updatedDateTimes = [...courseDetails.selectedDateTimes];
-    updatedDateTimes[dateIndex].times.splice(timeIndex, 1);
+   
+    return updatedChips.filter(entry => entry.time.length > 0);
+  });
+};
 
-    if (updatedDateTimes[dateIndex].times.length === 0) {
-      updatedDateTimes.splice(dateIndex, 1);
+
+const handleSubmit = async(event)=>{
+  event.preventDefault(); 
+
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('description', description);
+  formData.append('price', price);
+  formData.append('image', image);
+  formData.append('maxUsers',maxUsers)
+  formData.append('dateTimeChips', JSON.stringify(dateTimeChips)); 
+
+  try {
+    const response = await fetch('/api/addcourse', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if(response.status==201){
+      window.location.reload()
+    }
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    setCourseDetails({ ...courseDetails, selectedDateTimes: updatedDateTimes });
-  };
+    // Handle the response from the server
+    const result = await response.json();
+    console.log('Server response:', result);
+    // Reset form or redirect user based on the response
+  } catch (error) {
+    console.error('Submission error:', error);
+  }
+}
+  
 
-  const handleDateDelete = (dateIndex) => {
-    const updatedDateTimes = [...courseDetails.selectedDateTimes];
-    updatedDateTimes.splice(dateIndex, 1);
-    setCourseDetails({ ...courseDetails, selectedDateTimes: updatedDateTimes });
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(courseDetails);
-  };
 
   const times = ['09:00', '12:00', '15:00', '18:00'];
 
@@ -79,7 +96,7 @@ const AddCourse = () => {
       <Typography variant="h6" style={{ marginBottom: '20px' }}>
         Add New Course
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} >
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <TextField
@@ -87,8 +104,8 @@ const AddCourse = () => {
               variant="outlined"
               fullWidth
               name="title"
-              value={courseDetails.title}
-              onChange={handleChange}
+           
+              onChange={(e)=>{setTitle(e.target.value)}}
             />
           </Grid>
           <Grid item xs={12}>
@@ -104,35 +121,12 @@ const AddCourse = () => {
                 marginTop: '8px', // Standard margin top
               }}
               name="description"
-              value={courseDetails.description}
-              onChange={handleChange}
+            
+              onChange={(e)=>{setDescriptiom(e.target.value)}}
             />
           </Grid>
           <Grid item xs={12}>
-          <input
-            accept="image/*"
-            style={{ display: 'none' }}
-            id="image-upload"
-            type="file"
-            onChange={handleImageChange}
-          />
-          <label htmlFor="image-upload">
-            <Button variant="contained" color="primary" component="span">
-              Upload Image
-            </Button>
-          </label>
-          {courseDetails.image && (
-            <>
-              <Typography variant="body2" style={{ marginLeft: '10px' }}>
-                {courseDetails.image.name}
-              </Typography>
-              <Image
-                src={courseDetails.previewImage}
-                alt="Preview"
-                style={{ marginTop: '10px', maxWidth: '100%', maxHeight: '200px' }}
-              />
-            </>
-          )}
+          <TextField type='file' placeholder='Uplaod the image' sx={{width:'100%'}} onChange={(e)=>setImage(e.target.files[0])} /> 
         </Grid>
           <Grid item xs={12}>
             <TextField
@@ -140,73 +134,67 @@ const AddCourse = () => {
               variant="outlined"
               fullWidth
               name="price"
-              value={courseDetails.price}
+              
               InputProps={{
                 startAdornment: <InputAdornment position="start">$</InputAdornment>,
               }}
-              onChange={handleChange}
+              onChange={(e)=>{setPrice(e.target.value)}}
             />
           </Grid>
           <Grid item xs={12}>
-            {courseDetails.selectedDateTimes.map((dateTime, dateIndex) => (
-              <div key={dateIndex} style={{ marginBottom: '10px' }}>
-                <Typography variant="subtitle1">{`Date: ${dateTime.date}`}</Typography>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  size="small"
-                  onClick={() => handleDateDelete(dateIndex)}
-                  style={{ marginBottom: '5px' }}
-                >
-                  Delete Date
-                </Button>
-                <div>
-                  {dateTime.times.map((time, timeIndex) => (
-                    <Chip
-                      key={timeIndex}
-                      label={time}
-                      onDelete={() => handleChipDelete(dateIndex, timeIndex)}
-                      style={{ marginRight: '5px', marginBottom: '5px' }}
-                    />
-                  ))}
-                </div>
-                <FormControl fullWidth>
-                  {/* <InputLabel>Available Times</InputLabel> */}
-                  <Select
-                    multiple
-                    value={[]}
-                    onChange={(event) => handleTimeChange(dateIndex, event.target.value)}
-                    renderValue={(selected) => (
-                      <div>
-                        {selected.map((value, index) => (
-                          <Chip
-                            key={index}
-                            label={value}
-                            onDelete={() => handleChipDelete(dateIndex, index)}
-                            style={{ marginRight: '5px', marginBottom: '5px' }}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  >
-                    {times.map((time) => (
-                      <MenuItem key={time} value={time}>
-                        {time}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </div>
-            ))}
-            <Typography>Date & Time</Typography>
             <TextField
-              // label="Select Date"
-              type="date"
+              label="Max Users"
+              variant="outlined"
               fullWidth
-              name="selectedDate"
-              value={courseDetails.selectedDate}
-              onChange={handleDateChange}
+              type='number'
+              name="users"
+              onChange={(e)=>{setMaxUser(e.target.value)}}
             />
+          </Grid>
+          <Grid item xs={12}>
+          <>
+            <Box sx={{ width: '100%', display: 'flex', alignItems: 'center',  justifyContent: 'center' }}>
+                <TextField
+                    type="date"
+                    fullWidth
+                    value={selectedDate}
+                    sx={{ width: '20%',borderRadius:0 }}
+                    onChange={handleDateChange}
+                    InputProps={{style:{borderRadius:0}}}
+                />
+                <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={selectedTime}
+                    sx={{ width: '70%',borderRadius:0 }}
+                    onChange={handleTimeChange}
+                >
+                    {times.map((time, index) => (
+                        <MenuItem key={index} value={time}>{time}</MenuItem>
+                    ))}
+                </Select>
+                <Button sx={{width:'10%',background:'#000',height:'55px',borderRadius:0,'&:hover':{background:'#000'}}} onClick={addDateTime}>
+                    <Add style={{color:'white'}}/>
+                </Button>
+            </Box>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px',justifyContent:'center' }}>
+                {dateTimeChips.map((entry, index) => (
+                    <Box key={index}>
+                        <Typography variant="subtitle1" fontSize='15px' fontWeight='bold'>{entry.date}</Typography>
+                        {entry.time.map((time, timeIndex) => (
+                            <Chip key={timeIndex} sx={{marginRight:'1rem',background:'#7f63f4'}}  label={time} 
+                            onDelete={() => deleteChip(entry.date, time)}
+                            deleteIcon={<CloseIcon />}
+                            />
+                        ))}
+                    </Box>
+                ))}
+            </Box>
+        </>
+            
+
+                
+
           </Grid>
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary">

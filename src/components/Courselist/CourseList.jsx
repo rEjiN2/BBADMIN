@@ -1,6 +1,6 @@
 // ** MUI Imports
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Chip from '@mui/material/Chip'
@@ -13,85 +13,21 @@ import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 import { Button } from '@mui/material'
 import Link from 'next/link'
+import Image from 'next/image';
 
-const rows = [
-  {
-    title : 'Stock Learning Beginer',
-    desc: 'Lorem Ios doll lorek kosad jopas Lorem Ios doll lorek kosad jopas',
-    image: 'Small Img',
-    price: '$19586.23',
-    dates: '09/23/2024 - 12/23/2024',
-    times: '9am 10.30am 11am 3pm',
-   
-  },
-  {
-    title : 'Stock Learning Beginer',
-    desc: 'Lorem Ios doll lorek kosad jopas Lorem Ios doll lorek kosad jopas',
-    image: 'Small Img',
-    price: '$19586.23',
-    dates: '09/23/2024 - 12/23/2024',
-    times: '9am 10.30am 11am 3pm',
-  },
-  {
-    title : 'Stock Learning Beginer',
-    desc: 'Lorem Ios doll lorek kosad jopas Lorem Ios doll lorek kosad jopas',
-    image: 'Small Img',
-    price: '$19586.23',
-    dates: '09/23/2024 - 12/23/2024',
-    times: '9am 10.30am 11am 3pm',
-  },
-  {
-    title : 'Stock Learning Beginer',
-    desc: 'Lorem Ios doll lorek kosad jopas Lorem Ios doll lorek kosad jopas',
-    image: 'Small Img',
-    price: '$19586.23',
-    dates: '09/23/2024 - 12/23/2024',
-    times: '9am 10.30am 11am 3pm',
-  },
-  {
-    title : 'Stock Learning Beginer',
-    desc: 'Lorem Ios doll lorek kosad jopas Lorem Ios doll lorek kosad jopas',
-    image: 'Small Img',
-    price: '$19586.23',
-    dates: '09/23/2024 - 12/23/2024',
-    times: '9am 10.30am 11am 3pm',
-  },
-  {
-    title : 'Stock Learning Beginer',
-    desc: 'Lorem Ios doll lorek kosad jopas Lorem Ios doll lorek kosad jopas',
-    image: 'Small Img',
-    price: '$19586.23',
-    dates: '09/23/2024 - 12/23/2024',
-    times: '9am 10.30am 11am 3pm',
-  },
-  {
-    title : 'Stock Learning Beginer',
-    desc: 'Lorem Ios doll lorek kosad jopas Lorem Ios doll lorek kosad jopas',
-    image: 'Small Img',
-    price: '$19586.23',
-    dates: '09/23/2024 - 12/23/2024',
-    times: '9am 10.30am 11am 3pm',
-  },
-  {
-    title : 'Stock Learning Beginer',
-    desc: 'Lorem Ios doll lorek kosad jopas Lorem Ios doll lorek kosad jopas',
-    image: 'Small Img',
-    price: '$19586.23',
-    dates: '09/23/2024 - 12/23/2024',
-    times: '9am 10.30am 11am 3pm',
-  }
-]
 
-const statusObj = {
-  applied: { color: 'info' },
-  rejected: { color: 'error' },
-  current: { color: 'primary' },
-  resigned: { color: 'warning' },
-  professional: { color: 'success' }
-}
 
 const CourseList = () => {
-  const [courseData, setCourseData] = useState(rows);
+  const [courseData, setCourseData] = useState([]);
+  const [visibleMeetingId, setVisibleMeetingId] = useState(null);
+
+const toggleMeetingLink = (id) => {
+  if (visibleMeetingId === id) {
+    setVisibleMeetingId(null); 
+  } else {
+    setVisibleMeetingId(id);
+  }
+};
 
   const handleEdit = (index) => {
     const updatedData = [...courseData];
@@ -99,11 +35,34 @@ const CourseList = () => {
     setCourseData(updatedData);
   };
 
+
+  useEffect(()=>{
+  const fetchCourses = async()=>{
+    const response   = await fetch('/api/getCourse',{
+      method:'GET',
+      headers:{
+        'Content-type':'application/json'
+      }
+    })
+    if(response.ok){
+      const courses = await response.json()
+      setCourseData(courses)
+    }
+   
+
+  }
+
+  fetchCourses()
+  },[])
+
+
+
   const handleDelete = (index) => {
     const updatedData = courseData.filter((_, i) => i !== index);
     setCourseData(updatedData);
   };
 
+  console.log(courseData);
 
   return (
     <Card sx={{margin:'1rem'}}>
@@ -120,13 +79,15 @@ const CourseList = () => {
               <TableCell>Image</TableCell>
               <TableCell>Price</TableCell>
               <TableCell>Dates</TableCell>
-              <TableCell>Available Times</TableCell>
+              <TableCell>Links</TableCell>
               <TableCell>Options</TableCell>
          
             </TableRow>
           </TableHead>
           <TableBody>
-        {courseData.map((row, index) => (
+        {courseData.map((row, index) => 
+        
+        (
           <TableRow hover key={index} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
          <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -134,11 +95,66 @@ const CourseList = () => {
                     {/* <Typography variant='caption'>{row.booking}</Typography> */}
                   </Box>
                 </TableCell>
-                <TableCell>{row.desc}</TableCell>
-                <TableCell>{row.image}</TableCell>
-                <TableCell>{row.price}</TableCell>
-                <TableCell>{row.dates}</TableCell>
-                <TableCell>{row.times}</TableCell>
+                <TableCell>{row.description}</TableCell>
+                <TableCell>
+                  <>
+                {
+  (row.image && (row.image.startsWith('http://') || row.image.startsWith('https://') || row.image.startsWith('/'))) ? (
+    <Image src={row.image} alt='img' width={50} height={50} />
+  ) : (
+    // Optional: Render a placeholder or nothing if the source is invalid
+    <div>No valid image</div>
+  )
+}
+</>
+</TableCell>
+                <TableCell> {row.price}</TableCell>
+                <TableCell>
+  <div>
+    {row.dates ? (
+      (() => {
+        try {
+          const datesArray = JSON.parse(row.dates);
+          return (
+            Array.isArray(datesArray) && datesArray.map((item, index) => (
+              <div key={index}>
+                <h3>Date: {item.date}</h3>
+                <ul>
+                  {item.time.map((time, timeIndex) => (
+                    <li key={timeIndex}>Time: {time}</li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          );
+        } catch (e) {
+          console.error('Error parsing JSON:', e);
+          return <div>Invalid date format</div>;
+        }
+      })()
+    ) : <div>No dates available</div>}
+  </div>
+</TableCell>
+
+               
+<TableCell>
+    {row.meetings.map((meeting, index) => (
+      <div key={meeting._id}>
+        <p>Date: {meeting.date}</p>
+        <p>Time: {meeting.time}</p>
+        <a href={meeting.link} target="_blank" rel="noopener noreferrer">Join Meeting</a>
+        <p onClick={() => toggleMeetingLink(meeting._id)} style={{cursor:'pointer',padding:'0.5rem' ,background:'lightyellow',width:'50%',textAlign:"center",borderRadius:'25px',fontWeight:'bold',color:'#000'}}>
+          View Link
+        </p>
+        {visibleMeetingId === meeting._id && (
+          <a href={meeting.link} target="_blank" rel="noopener noreferrer">{meeting.link}</a>
+        )}
+      </div>
+    ))}
+  </TableCell>
+
+
+                
                 <TableCell>
                   {/* <Chip
                     label={row.status}
