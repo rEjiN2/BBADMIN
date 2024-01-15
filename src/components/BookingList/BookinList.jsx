@@ -1,4 +1,6 @@
 // ** MUI Imports
+"use client"
+import React,{useState,useEffect} from 'react'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Chip from '@mui/material/Chip'
@@ -10,6 +12,7 @@ import TableCell from '@mui/material/TableCell'
 import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 import { Button } from '@mui/material'
+
 
 const rows = [
   {
@@ -95,6 +98,50 @@ const statusObj = {
 }
 
 const DashboardTable = () => {
+ const [bookings,setBookings] = useState([])
+
+
+ useEffect(()=>{
+  const fetchBookings = async()=>{
+    const booking = await fetch('/api/fetchBooking',{
+      method:'GET',
+      headers:{
+        'Content-type':'application/json'
+      },
+
+    })
+
+    const bookings = await booking.json()
+    setBookings(bookings)
+
+    console.log(bookings,"bookings");
+    
+    
+  }
+
+
+  fetchBookings()
+ },[])
+
+ const handleApprove = async(bookingId,bookingLink)=>{
+        // e.preventDefault()
+        console.log(bookingLink,"link");
+        const approveBooking = await fetch(`api/approveBooking/${bookingId}`,{
+          method:'POST',
+          body:JSON.stringify({bookingLink}),
+          headers:{
+            'Content-type':'application/json'
+          }
+        })
+
+        const approved = await approveBooking.json()
+ }
+
+    
+
+
+
+
   return (
     <Card>
         <Typography padding='1rem' fontFamily='Rubik' fontSize='25px'>Booking List</Typography>
@@ -112,7 +159,7 @@ const DashboardTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map(row => (
+            {bookings.map(row => (
               <TableRow hover key={row.name} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
                 <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -121,9 +168,14 @@ const DashboardTable = () => {
                   </Box>
                 </TableCell>
                 <TableCell>{row.email}</TableCell>
-                <TableCell>{row.date}</TableCell>
-                <TableCell>{row.Price}</TableCell>
-                <TableCell>{row.link}</TableCell>
+                <TableCell>{row.date}<br/>
+                {row.time}
+                </TableCell>
+                <TableCell> {row.package}</TableCell>
+                <TableCell> 
+    <a href={row.link} target="_blank" rel="noopener noreferrer">Join Meeting</a> 
+</TableCell>
+
                 <TableCell>
                   {/* <Chip
                     label={row.status}
@@ -135,13 +187,17 @@ const DashboardTable = () => {
                       '& .MuiChip-label': { fontWeight: 500 }
                     }}
                   /> */}
-                  {row.status == 'finished' && (
-                  <Button disabled variant='outlined' sx={{ width:'100px', border:'2px solid #f3f3f3',background:'#11ffbd',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#11ffbd'}}} >Complete</Button>
-                  )}
+                  {row.aprroved ==true  ? (
+      <Button disabled  variant='outlined' sx={{ width:'100px', border:'2px solid #f3f3f3',background:'#11ffbd',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#11ffbd'}}} >Aprroved</Button>
+                   )
+                  :
+                  <>
+                  <Button onClick={()=>handleApprove(row._id,row.link)}  variant='outlined' sx={{ width:'100px', border:'2px solid #f3f3f3',background:'#11ffbd',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#11ffbd'}}} >Aprrove</Button>
+                  <Button variant='outlined' sx={{ width:'100px',border:'2px solid #f3f3f3',background:'#f9d423',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#f9d423'}}} >Delete</Button>
+                  </>
+                  }
+                
 
-{row.status == 'pending' && (  
-                  <Button variant='outlined' sx={{ width:'100px',border:'2px solid #f3f3f3',background:'#f9d423',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#f9d423'}}} >Pending</Button>
-)}
                 </TableCell>
                
               </TableRow>
