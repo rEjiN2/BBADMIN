@@ -9,7 +9,6 @@ export const GET = async (request) => {
 
         const courses = await Courses.find();
         console.log("Courses retrieved:", courses);
-
       
         if (courses.length === 0) {
             return new NextResponse("No courses available", { status: 404 });

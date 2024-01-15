@@ -7,7 +7,8 @@ import CloseIcon from '@mui/icons-material/Close';
 
 const AddCourse = () => {
   const [title,setTitle] = useState('')
-  const [description,setDescriptiom] = useState('')
+  const [description, setDescription] = useState('');
+  const maxCharacters = 60;
   const [image,setImage] = useState(null);
   const [price,setPrice]= useState(80)
   const [selectedDate, setSelectedDate] = useState('');
@@ -19,6 +20,17 @@ const AddCourse = () => {
 };
 const handleTimeChange = (event) => {
     setSelectedTime(event.target.value);
+};
+
+const handleDescriptionChange = (e) => {
+  const inputText = e.target.value;
+  if (inputText.length <= maxCharacters) {
+    setDescription(inputText);
+  } else {
+    // Truncate the input to the maximum allowed characters
+    const truncatedText = inputText.slice(0, maxCharacters);
+    setDescription(truncatedText);
+  }
 };
 
 const addDateTime = () => {
@@ -109,20 +121,21 @@ const handleSubmit = async(event)=>{
             />
           </Grid>
           <Grid item xs={12}>
-            <TextareaAutosize
-              minRows={3}
-              placeholder="Course Description"
-              style={{
-                width: '100%',
-                borderRadius: '4px',
-                fontSize: '16px',
-                border: '1px solid #ced4da', // Standard border color
-                padding: '8px', // Standard padding
-                marginTop: '8px', // Standard margin top
-              }}
-              name="description"
-            
-              onChange={(e)=>{setDescriptiom(e.target.value)}}
+            <TextField
+             multiline
+             rows={3}
+             placeholder="Course Description"
+             style={{
+               width: '100%',
+               borderRadius: '4px',
+               fontSize: '16px',
+               border: '1px solid #ced4da',
+               padding: '8px',
+               marginTop: '8px',
+             }}
+             name="description"
+             value={description}
+             onChange={handleDescriptionChange}
             />
           </Grid>
           <Grid item xs={12}>
