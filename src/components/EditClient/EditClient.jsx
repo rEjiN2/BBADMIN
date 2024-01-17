@@ -14,51 +14,77 @@ import Select from '@mui/material/Select';
 
 
 
-const AddClients = () => {
+const EditClient = () => {
  const [subscriptionType,setSubscriptionType] = useState('monthly')
  const [name ,setName] = useState('')
  const [email ,setEmail] = useState('')
  const [price,setPrice] = useState(50)
  const [epackage,setPackage] = useState('')
  const [courses,setCourses]= useState([])
+ const param = useParams()
+ const [client,setClient] = useState({})
 
 
 useEffect(()=>{
-const fetchCourse = async()=>{
-const res = await fetch('/api/getCourse',{
-  method:'GET',
-  headers:{
-    'Content-type':'application/json'
-  }
+const fetchClient = async()=>{
+const res = await fetch(`/api/fetchClient/${param.id}`,{
+    method:'GET',
+    headers:{
+        'Content-type':'application/json'
+    }
 })
 
+
+
+
+
 const response = await res.json()
-console.log(response);
-setCourses(response)
+setName(response.name)
+setEmail(response.email)
+setSubscriptionType(response.subscriptionType)
+setPrice(response.price)
+setPackage(response.package)
 }
-fetchCourse()
+fetchClient()
 },[])
 
+
+
+useEffect(()=>{
+  const fetchCourse = async()=>{
+  const res = await fetch('/api/getCourse',{
+    method:'GET',
+    headers:{
+      'Content-type':'application/json'
+    }
+  })
+  
+  const response = await res.json()
+  
+  setCourses(response)
+  }
+  fetchCourse()
+  },[])
 
  const handleChange = (event) => {
   setSubscriptionType(event.target.value)
      } 
 
 
-      const handleAddClient = async()=>{
-            const res = await fetch('/api/addclient',{
+      const handleEditClient = async()=>{
+            const res = await fetch(`/api/editClient/${param.id}`,{
               method:'POST',
               body:JSON.stringify({
                 name,
                 email,
-                 subscriptionType,
+                subscriptionType,
                 price,
-                epackage
+               package: epackage
               })
             })
             const client = await res.json()
             if(res.ok){
-              alert("Subscribed Client")
+              alert("Client Updated")
               window.location.reload()
             }
           }
@@ -139,7 +165,7 @@ fetchCourse()
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={epackage}
-          // label="Age"
+          
           sx={{width:'100%',height:'40px'}}
           onChange={(e)=>setPackage(e.target.value)}
         >
@@ -153,7 +179,7 @@ fetchCourse()
                   
                    
                      <Box sx={{display:'grid',placeItems:'center'}}>                 
-                       <Button onClick={handleAddClient}  sx={{marginTop:'1rem',background:'#141517',color:'#fff',width:'150px',textTransform:'none','&:hover':{background:'#141517',color:'#fff'}}}> Add Client </Button>
+                       <Button onClick={handleEditClient}  sx={{marginTop:'1rem',background:'#141517',color:'#fff',width:'150px',textTransform:'none','&:hover':{background:'#141517',color:'#fff'}}}> Edit Client </Button>
                      </Box>
 
 
@@ -162,4 +188,4 @@ fetchCourse()
   )
 }
 
-export default AddClients
+export default EditClient

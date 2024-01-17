@@ -12,62 +12,41 @@ import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 import { Button  } from '@mui/material'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
-const rows = [
-  {
-    name:'rejin',
-    email:'rejin@gmail.com',
-    role:'manager',
-    password:'rak352',
-   
-  },
-  {
-    name:'rohu',
-    email:'rejin@gmail.com',
-    role:'hr',
-    password:'rak352',
-  },
-  {
-    name:'ejin',
-    email:'re@gmail.com',
-    role:'sales head',
-    password:'rak352',
-  },
-  {
-    name:'Binsghad',
-    email:'rejin@gmail.com',
-    role:'manager',
-    password:'rak352',
-  },
-  {
-    name:'rejin',
-    email:'rejin@gmail.com',
-    role:'manager',
-    password:'rak352',
-  },
-  {
-    name:'Jokut',
-    email:'rejin@gmail.com',
-    role:'manager',
-    password:'rak352',
-  },
-  {
-    name:'mahreb',
-    email:'rejin@gmail.com',
-    role:'manager',
-    password:'rak352',
-  },
-  {
-    name:'thopan',
-    email:'rejin@gmail.com',
-    role:'manager',
-    password:'rak352',
-  }
-]
+
 
 
 
 const AdminList = () => {
+const [adminList,setAdminList] = useState([])
+const router = useRouter()
+
+useEffect(()=>{
+const fetchAdmins = async()=>{
+
+  const admins = await fetch('/api/getAdmins',{
+    method:'GET',
+    headers:{
+      'Content-type':'application/json'
+    }
+  })
+
+  const sAdmins = await admins.json()
+         setAdminList(sAdmins)
+   } 
+
+fetchAdmins()
+},[])
+
+console.log(adminList,"admin");
+
+const handleUpdate=(adminId)=>{
+     router.push(`/updateAdmin/${adminId}`)
+}
+
+
   return (
     <Card sx={{margin:'1rem'}}>
         <Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem'}}>
@@ -88,8 +67,8 @@ const AdminList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map(row => (
-              <TableRow hover key={row.name} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
+            {adminList.map((row,index) => (
+              <TableRow hover key={index} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
                 <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{row.name}</Typography>
@@ -98,7 +77,7 @@ const AdminList = () => {
                 </TableCell>
                 <TableCell>{row.email}</TableCell>
                 <TableCell>
-                    {row.role == 'manager' && (
+                    {row.role == 'admin' && (
                         <Chip
                         label={row.role}
                         color='warning'
@@ -111,9 +90,9 @@ const AdminList = () => {
                         }}
                       />
                     )}
-                {row.role == 'hr' && (
+                {row.role == 'sadmin' && (
                         <Chip
-                        label={row.role}
+                        label="Super Admin+"
                         color='success'
                         sx={{
                             width:'80px',
@@ -124,7 +103,7 @@ const AdminList = () => {
                         }}
                       />
                     )}
-                    {row.role == 'sales head' && (
+                    {/* {row.role == 'sales head' && (
                         <Chip
                         label={row.role}
                         color='info'
@@ -136,12 +115,12 @@ const AdminList = () => {
                           '& .MuiChip-label': { fontWeight: 500 }
                         }}
                       />
-                    )}
+                    )} */}
                 </TableCell>
-                <TableCell>  {row.password}</TableCell>
+                <TableCell >  xxxxxxxx</TableCell>
                 
                 <TableCell>
-                  <Button variant='outlined' sx={{ width:'200px',marginRight:'0.5rem', border:'2px solid #f3f3f3',background:'#11ffbd',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#11ffbd'}}} >Update</Button>
+                  <Button onClick={()=>handleUpdate(row._id)} variant='outlined' sx={{ width:'100px',marginRight:'0.5rem', border:'2px solid #f3f3f3',background:'#11ffbd',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#11ffbd'}}} >Update</Button>
                   <Button variant='outlined' sx={{ width:'100px',border:'2px solid #f3f3f3',background:'#f9d423',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#f9d423'}}} >Delete</Button>
 
                 </TableCell>

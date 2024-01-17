@@ -12,71 +12,52 @@ import Typography from '@mui/material/Typography'
 import TableContainer from '@mui/material/TableContainer'
 import { Button } from '@mui/material'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
-const rows = [
-  {
-    name:'rejin',
-    email:'rejin@gmail.com',
-    subtype:'monthly',
-    price:'600AED',
-    package:'Stock learning',
-  },
-  {
-    name:'rohith',
-    email:'rejin@gmail.com',
-    subtype:'monthly',
-    price:'600AED',
-    package:'Investing in Stock',
-  },
-  {
-    name:'janish',
-    email:'rejin@gmail.com',
-    subtype:'yearly',
-    price:'600AED',
-    package:'Stock learning',
-  },
-  {
-    name:'rejin',
-    email:'rejin@gmail.com',
-    subtype:'monthly',
-    price:'600AED',
-    package:'Stock learning',
-  },
-  {
-    name:'arshad',
-    email:'rejin@gmail.com',
-    subtype:'monthly',
-    price:'600AED',
-    package:'Select value Companies',
-  },
-  {
-    name:'rejin',
-    email:'rejin@gmail.com',
-    subtype:'monthly',
-    price:'600AED',
-    package:'Select value Companies',
-  },
-  {
-    name:'rejin',
-    email:'rejin@gmail.com',
-    subtype:'monthly',
-    price:'600AED',
-    package:'Select value Companies',
-  },
-  {
-    name:'rohith',
-    email:'rohith@gmail.com',
-    subtype:'yearly',
-    price:'600AED',
-    package:'Investing in Stock',
-  }
-]
 
 
 
 const ClientList = () => {
+  const [subscribers,setSubscriber] = useState([])
+  const router = useRouter()
+
+  useEffect(()=>{
+const fetchSubscribers = async()=>{
+const res = await fetch('/api/fetchSubscriber',{
+  method:'GET',
+  headers:{
+    'Content-type':'application/json'
+  }
+})
+const response = await res.json()
+console.log(response);
+setSubscriber(response)
+}
+fetchSubscribers()
+  },[])
+
+
+const handleEdit = async(clientId)=>{
+  // const res = await fetch(`/api/editClient/${clientId}`,{
+  //   method:'POST',
+  //   headers:{
+  //     'Content-type':'application/json'
+  //   }
+  // })
+  //  if(res.ok){
+  //   alert('Client Updated')
+  //  }else{
+  //   alert('error occured')
+  //  }
+ router.push(`/editclient/${clientId}`)
+}
+
+
+
   return (
-    <Card sx={{margin:'1rem'}}>
+    <Box sx={{display:'grid',placeItems:'center'}}>
+    <Card sx={{margin:'1rem',width:'90%',height:'80dvh'}}>
         <Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem'}}>
         <Typography padding='1rem' fontFamily='Rubik' fontSize='25px'>Client List</Typography>
         <Link href='./addclients'><Button  variant='outlined' sx={{ width:'200px',height:'40px', border:'2px solid #f3f3f3',background:'#f9d423',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#f9d423'}}}>  Add Client</Button></Link>
@@ -95,8 +76,8 @@ const ClientList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map(row => (
-              <TableRow hover key={row.name} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
+            {subscribers.map(row => (
+              <TableRow hover key={row._id} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
                 <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{row.name}</Typography>
@@ -105,9 +86,9 @@ const ClientList = () => {
                 </TableCell>
                 <TableCell>{row.email}</TableCell>
                 <TableCell>
-                    {row.subtype == 'monthly' && (
+                    {row.subscriptionType == 'monthly' && (
                         <Chip
-                        label={row.subtype}
+                        label={row.subscriptionType}
                         color='warning'
                         sx={{
                             width:'80px',
@@ -118,9 +99,9 @@ const ClientList = () => {
                         }}
                       />
                     )}
-                {row.subtype == 'yearly' && (
+                {row.subscriptionType == 'yearly' && (
                         <Chip
-                        label={row.subtype}
+                        label={row.subscriptionType}
                         color='success'
                         sx={{
                             width:'80px',
@@ -135,18 +116,9 @@ const ClientList = () => {
                 <TableCell>{row.price}</TableCell>
                 <TableCell>{row.package}</TableCell>
                 <TableCell>
-                  {/* <Chip
-                    label={row.status}
-                    color={statusObj[row.status].color}
-                    sx={{
-                      height: 24,
-                      fontSize: '0.75rem',
-                      textTransform: 'capitalize',
-                      '& .MuiChip-label': { fontWeight: 500 }
-                    }}
-                  /> */}
                  
-                  <Button variant='outlined' sx={{ width:'200px',marginRight:'0.5rem', border:'2px solid #f3f3f3',background:'#11ffbd',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#11ffbd'}}} >Send ZoomLink</Button>
+                 
+                  <Button onClick={()=> handleEdit(row._id)} variant='outlined' sx={{ width:'100px',marginRight:'0.5rem', border:'2px solid #f3f3f3',background:'#11ffbd',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#11ffbd'}}} >Edit</Button>
                   <Button variant='outlined' sx={{ width:'100px',border:'2px solid #f3f3f3',background:'#f9d423',textTransform:'none' , color:'#fff',borderRadius:'17px','&:hover':{border:'2px solid #f3f3f3',background:'#f9d423'}}} >Delete</Button>
 
                 </TableCell>
@@ -157,6 +129,7 @@ const ClientList = () => {
         </Table>
       </TableContainer>
     </Card>
+    </Box>
   )
 }
 

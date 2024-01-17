@@ -104,7 +104,8 @@ const handleSubmit = async(event)=>{
   const times = ['09:00', '12:00', '15:00', '18:00'];
 
   return (
-    <Paper style={{ padding: '20px', margin: '20px', width: '60%' }}>
+    <Box sx={{display:'grid' ,placeItems:'center',height:'90dvh'}}>
+    <Paper style={{ padding: '20px', margin: '20px', width: '60%', }}>
       <Typography variant="h6" style={{ marginBottom: '20px' }}>
         Add New Course
       </Typography>
@@ -217,6 +218,7 @@ const handleSubmit = async(event)=>{
         </Grid>
       </form>
     </Paper>
+    </Box>
   );
 };
 

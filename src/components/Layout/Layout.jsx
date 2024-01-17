@@ -117,7 +117,7 @@ const BasicLayout = ({ children }) => {
                 <PeopleIcon  sx={{color:'#F3904F'}}/>
               </ListItemIcon>
               <ListItemText
-                primary="Client List"
+                primary="Subscriber List"
                 sx={{
                   fontFamily: "CircularStdBold",
                   color: "#237A57",
@@ -210,7 +210,7 @@ const BasicLayout = ({ children }) => {
 
 
 
-
+<Link href='/login'>
             <ListItemButton
               selected={selectedIndex === 4}
               onClick={(event) => handleListItemClick(event, 6)}
@@ -229,7 +229,7 @@ const BasicLayout = ({ children }) => {
                 }}
               />
             </ListItemButton>
-
+            </Link>
             
           </List>
         </Box>

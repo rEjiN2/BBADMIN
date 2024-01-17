@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import TextField from '@mui/material/TextField';
@@ -8,15 +8,39 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import Typography from '@mui/material/Typography';
 import { Button, Paper } from '@mui/material';
+import { useParams } from 'next/navigation';
 import Radio from '@mui/material/Radio';
 
-const AddAdmin = () => {
+const UpdateAdmin = () => {
    const [name,setName] = useState('')
    const [email,setEmail]= useState('')
    const [role,setRole]= useState('admin')
    const [password,setPassword] =useState('')
    const [confirmPassword,setConfirmPassword] =useState('')
    const [error,setError]= useState('')
+   const [admin,setAdmin]= useState({})
+   const param = useParams()
+
+   console.log(param.id,"par");
+
+   useEffect(()=>{
+const fetchAdmin = async()=>{
+const res =await fetch(`/api/fetchAdmin/${param.id}`,{
+    method:'GET',
+    headers:{
+        'Content-type':'application/json'
+    }
+})
+const response = await res.json()
+console.log(response,"res");
+setName(response.name)
+setEmail(response.email)
+setRole(response.role)
+// setPassword(response.password)
+}
+
+fetchAdmin()
+   },[])
 
    
 
@@ -24,45 +48,47 @@ const AddAdmin = () => {
     setRole(event.target.value);
   };
 
-   const handleAddAdmin = async()=>{
-            
-    if(confirmPassword == password ){
-     console.log(name,email,role,password,"this");
-      
-      // const formData = new FormData()
-      // formData.append('name',JSON.stringify(name))
-      // formData.append('email',JSON.stringify(email))
-      // formData.append('role',JSON.stringify(role))
-      // formData.append('password',JSON.stringify(password))
-      // console.log(formData,"formData");
-   
-   try{
-    const res= await fetch('/api/addadmin',{
-      method:'POST',
-      body: JSON.stringify({
+  const handleUpdateAdmin = async() => {
+    // Initialize the data object with fields other than password
+    const dataToUpdate = {
         name,
         email,
-        role,password
-      }),
-    })
-    if(res.ok){
-      const result = await res.json()
-      console.log(result);
-      window.location.reload()
+        role,
+    };
+
+    
+    if (password && password === confirmPassword) {
+        dataToUpdate.password = password;
+    } else if (password) {
+        // If password fields are filled but do not match
+        setError('Passwords do not match.');
+        return;
     }
 
-   }catch(err){
-    console.log(err.message);
-   }
-       
-   
-       
-    }else{
-setError('Password not Match')
-    }
-   
+    
+    try {
+        const res = await fetch(`/api/updateAdmin/${param.id}`, {
+            method: 'POST',
+            body: JSON.stringify(dataToUpdate),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-   }
+        if (res.ok) {
+            const result = await res.json();
+            console.log(result);
+            alert('Admin updated successfully');
+            window.location.reload();
+        } else {
+            setError('Error updating admin.');
+        }
+    } catch (err) {
+        console.error(err.message);
+        setError('An error occurred.');
+    }
+}
+
 
 
 
@@ -71,7 +97,7 @@ setError('Password not Match')
   return (
     <Box sx={{display:'grid',placeItems:'center',height:'70dvh',margin:'3rem'}}>
                  <Paper sx={{width:'50%',padding:'2rem'}}>
-                  <Typography fontSize='25px' align='center' fontWeight='500'>Add Admins</Typography>
+                  <Typography fontSize='25px' align='center' fontWeight='500'>Update Admins</Typography>
                  
                   <Box >
                            <Typography fontSize='15px' fontWeight='500'>Name</Typography>
@@ -147,7 +173,7 @@ setError('Password not Match')
                   )}
                    
                      <Box sx={{display:'grid',placeItems:'center'}}>                 
-                       <Button onClick={handleAddAdmin} sx={{marginTop:'1rem',background:'#141517',color:'#fff',width:'150px',textTransform:'none','&:hover':{background:'#141517',color:'#fff'}}}> Add Admin </Button>
+                       <Button onClick={handleUpdateAdmin} sx={{marginTop:'1rem',background:'#141517',color:'#fff',width:'150px',textTransform:'none','&:hover':{background:'#141517',color:'#fff'}}}> Update Admin </Button>
                      </Box>
 
 
@@ -156,4 +182,4 @@ setError('Password not Match')
   );
 };
 
-export default AddAdmin;
+export default UpdateAdmin;
